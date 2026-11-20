@@ -84,14 +84,65 @@ func (tg *Tcg) Show(finalisers ...func(tg *Tcg)) {
 }
 
 func (tg *Tcg) updateScreen() {
-	blockW, blockH := tg.mode.Width(), tg.mode.Height()
-
 	for x := 0; x < tg.scrW; x++ {
 		for y := 0; y < tg.scrH; y++ {
-			charIndex := tg.Buf.getPixelsBlock(x*blockW, y*blockH, blockW, blockH)
-			tg.TCellScreen.SetContent(tg.config.clip.x+x, tg.config.clip.y+y, tg.mode.charMapping[charIndex], nil, tg.style)
+			tg.updateCell(x, y)
 		}
 	}
+}
+
+// Cell - terminal cell in characters, it is used for partial screen updates
+type Cell struct {
+	X, Y int
+}
+
+// Mode - pixel mode of the screen, it defines how many pixels one terminal cell contains.
+func (tg *Tcg) Mode() PixelMode {
+	return tg.mode
+}
+
+// CellRune - symbol that represents the given terminal cell for the current
+// buffer content and pixel mode. It is the exact rune that updateCell would
+// put on the screen, and is useful for tests and for computing the cells that
+// really changed. Cells outside the screen return the empty cell symbol.
+func (tg *Tcg) CellRune(x, y int) rune {
+	mode := tg.mode
+	blockW, blockH := mode.Width(), mode.Height()
+
+	// out of the visible screen: clamp to a valid (empty) area
+	if x < 0 || x >= tg.scrW || y < 0 || y >= tg.scrH {
+		return mode.charMapping[0]
+	}
+	// a partially filled last cell is padded with transparent pixels by
+	// getPixelsBlock, which stops at the buffer edge
+	charIndex := tg.Buf.getPixelsBlock(x*blockW, y*blockH, blockW, blockH)
+	return mode.charMapping[charIndex]
+}
+
+// updateCell - update one terminal cell from the pixel buffer
+func (tg *Tcg) updateCell(x, y int) {
+	if x < 0 || x >= tg.scrW || y < 0 || y >= tg.scrH {
+		return
+	}
+
+	tg.TCellScreen.SetContent(tg.config.clip.x+x, tg.config.clip.y+y, tg.CellRune(x, y), nil, tg.style)
+}
+
+// UpdateCells - update only the given terminal cells from the pixel buffer.
+// It does not call Show, so it can be combined with other cell updates.
+// Cells outside the screen are ignored, duplicates are harmless.
+// This is useful for sprite animations, where only the cells touched by the
+// sprite (or by its previous position) need to be repainted.
+func (tg *Tcg) UpdateCells(cells ...Cell) {
+	for _, cell := range cells {
+		tg.updateCell(cell.X, cell.Y)
+	}
+}
+
+// ShowCells - update only the given terminal cells from the pixel buffer and show the screen.
+func (tg *Tcg) ShowCells(cells ...Cell) {
+	tg.UpdateCells(cells...)
+	tg.TCellScreen.Show()
 }
 
 // Finish application

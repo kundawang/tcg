@@ -16,6 +16,7 @@ Go Graphics library for use in a text terminal. Only 1bit graphics can be used w
   * Buffer transform: [BitBlt](https://pkg.go.dev/github.com/msoap/tcg#Buffer.BitBlt) with [options](https://pkg.go.dev/github.com/msoap/tcg#BitBltOpt), [clear](https://pkg.go.dev/github.com/msoap/tcg#Buffer.Clear), [flip](https://pkg.go.dev/github.com/msoap/tcg#Buffer.HFlip), [invert](https://pkg.go.dev/github.com/msoap/tcg#Buffer.Invert), scroll ([vertical](https://pkg.go.dev/github.com/msoap/tcg#Buffer.VScroll), [horizontal](https://pkg.go.dev/github.com/msoap/tcg#Buffer.HScroll))
   * Sub-package for [turtle graphics](https://pkg.go.dev/github.com/msoap/tcg/turtle), also available [drawing](https://pkg.go.dev/github.com/msoap/tcg/turtle#Turtle.DrawScript) by text script
   * [Sprite](https://pkg.go.dev/github.com/msoap/tcg/sprite) support with [Put](https://pkg.go.dev/github.com/msoap/tcg/sprite#Sprite.Put), [Withdraw](https://pkg.go.dev/github.com/msoap/tcg/sprite#Sprite.Withdraw), [Move](https://pkg.go.dev/github.com/msoap/tcg/sprite#Sprite.Move), etc methods
+  * [Animated sprite](https://pkg.go.dev/github.com/msoap/tcg/sprite#NewAnimation) with multiple frames, per-frame durations and loop modes (repeat, once, ping-pong); only the changed terminal cells are repainted (see [Tcg.ShowCells](https://pkg.go.dev/github.com/msoap/tcg#Tcg.ShowCells))
 
 ## Install
 
@@ -74,7 +75,7 @@ See more [screenshots](https://github.com/msoap/tcg/wiki/Screenshots).
 
   * [ ] fonts support
   * [x] sprites
-  * [ ] animation in sprite
+  * [x] animation in sprite
 
 ## See also
 

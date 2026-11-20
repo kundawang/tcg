@@ -19,3 +19,6 @@ example-fractal-demo:
 
 example-tetris-game:
 	go run examples/tetris_game/tetris_game.go -mode 2x3
+
+example-sprite-animation:
+	go run examples/sprite_animation/sprite_animation.go -mode 2x3
